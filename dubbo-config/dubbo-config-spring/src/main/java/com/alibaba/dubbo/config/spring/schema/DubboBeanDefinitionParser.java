@@ -72,6 +72,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
 
     @SuppressWarnings("unchecked")
     private static BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, boolean required) {
+        //初始化BeanDefiniion
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
@@ -79,28 +80,35 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         if ((id == null || id.length() == 0) && required) {
             String generatedBeanName = element.getAttribute("name");
             if (generatedBeanName == null || generatedBeanName.length() == 0) {
+                //如果当前解析的类型是ProtocolConfig，则设置默认id为dubbo
                 if (ProtocolConfig.class.equals(beanClass)) {
                     generatedBeanName = "dubbo";
                 } else {
+                    //其他情况，默认id为接口类型
                     generatedBeanName = element.getAttribute("interface");
                 }
             }
+            //如果该节点没有interface属性（包含：registry,monitor,provider,consumer），则使用该节点的类型为id值
             if (generatedBeanName == null || generatedBeanName.length() == 0) {
                 generatedBeanName = beanClass.getName();
             }
             id = generatedBeanName;
             int counter = 2;
+            //生成不重复的id
             while (parserContext.getRegistry().containsBeanDefinition(id)) {
                 id = generatedBeanName + (counter++);
             }
         }
         if (id != null && id.length() > 0) {
+            // 防止并发情况下生成同样的bean
             if (parserContext.getRegistry().containsBeanDefinition(id)) {
                 throw new IllegalStateException("Duplicate spring bean id " + id);
             }
+            // 注册bean
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
             beanDefinition.getPropertyValues().addPropertyValue("id", id);
         }
+        //下面这几个if-else分别针对不同类型做特殊处理
         if (ProtocolConfig.class.equals(beanClass)) {
             for (String name : parserContext.getRegistry().getBeanDefinitionNames()) {
                 BeanDefinition definition = parserContext.getRegistry().getBeanDefinition(name);
@@ -282,12 +290,15 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                     if (tag.equals(node.getNodeName())
                             || tag.equals(node.getLocalName())) {
                         if (first) {
+                            //如果该providerBean没有设置default开关，且子节点中定义了serviceBean，则明确赋值该参数为false，也就是说该providerBean只作为其子serviceBean节点的默认协议
+                            //这样就不会让该providerBean的作用范围盲目扩大（成为所有serviceBean的默认协议）
                             first = false;
                             String isDefault = element.getAttribute("default");
                             if (isDefault == null || isDefault.length() == 0) {
                                 beanDefinition.getPropertyValues().addPropertyValue("default", "false");
                             }
                         }
+                        //所有子serviceBean定义节点全部解析并引用该providerBean作为默认值配置
                         BeanDefinition subDefinition = parse((Element) node, parserContext, beanClass, required);
                         if (subDefinition != null && ref != null && ref.length() > 0) {
                             subDefinition.getPropertyValues().addPropertyValue(property, new RuntimeBeanReference(ref));
