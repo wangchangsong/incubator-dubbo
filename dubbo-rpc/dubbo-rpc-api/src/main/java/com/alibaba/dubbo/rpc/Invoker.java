@@ -29,6 +29,7 @@ public interface Invoker<T> extends Node {
 
     /**
      * get service interface.
+     * 获得service的接口
      *
      * @return service interface.
      */

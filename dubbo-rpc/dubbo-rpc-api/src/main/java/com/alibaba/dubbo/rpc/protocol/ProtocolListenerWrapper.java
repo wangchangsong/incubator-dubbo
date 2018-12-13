@@ -38,6 +38,7 @@ public class ProtocolListenerWrapper implements Protocol {
     private final Protocol protocol;
 
     public ProtocolListenerWrapper(Protocol protocol) {
+
         if (protocol == null) {
             throw new IllegalArgumentException("protocol == null");
         }

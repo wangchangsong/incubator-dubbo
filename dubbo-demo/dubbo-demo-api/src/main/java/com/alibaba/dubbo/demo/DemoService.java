@@ -16,8 +16,14 @@
  */
 package com.alibaba.dubbo.demo;
 
+import java.net.URL;
+
 public interface DemoService {
 
     String sayHello(String name);
+
+    void getHello(String name);
+
+    URL getURL(String url);
 
 }

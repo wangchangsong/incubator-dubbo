@@ -19,6 +19,8 @@ package com.alibaba.dubbo.test.provider;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.dubbo.demo.DemoService;
 
+import java.net.URL;
+
 /**
  * Default {@link DemoService} implementation
  *
@@ -35,6 +37,16 @@ public class DefaultDemoService implements DemoService {
     @Override
     public String sayHello(String name) {
         return "DefaultDemoService - sayHell() : " + name;
+    }
+
+    @Override
+    public void getHello(String name) {
+
+    }
+
+    @Override
+    public URL getURL(String url) {
+        return null;
     }
 
 }

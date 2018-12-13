@@ -26,11 +26,11 @@
 
     <dubbo:registry address="N/A" id="naRegistry"/>
 
-    <dubbo:protocol p:protocol-paramA="protocol-paramA"/>
+    <dubbo:protocol/>
 
     <bean id="demoService" class="com.alibaba.dubbo.config.spring.impl.DemoServiceImpl"/>
 
-    <dubbo:service id="demoServiceExport" p:service-paramA="service-paramA" registry="naRegistry" ref="demoService"
+    <dubbo:service id="demoServiceExport" registry="naRegistry" ref="demoService"
                    interface="com.alibaba.dubbo.config.spring.api.DemoService"/>
 
 </beans>
